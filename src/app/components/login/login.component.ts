@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 
+import { NavbarComponent } from '../common/navbar/navbar.component';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -7,9 +8,15 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+/**
+* @description
+* Componente principal del login
+*/
+
+
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, NavbarComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
