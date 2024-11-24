@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { NavbarComponent } from '../common/navbar/navbar.component';
 
+import { CommonModule } from '@angular/common';
 interface Status {
   id: number;
   name: string;
@@ -15,7 +16,7 @@ interface Task {
 
 @Component({
   selector: 'app-kanban',
-  imports: [NavbarComponent],
+  imports: [NavbarComponent,CommonModule],
   templateUrl: './kanban.component.html',
   styleUrl: './kanban.component.css',
 })
@@ -27,7 +28,9 @@ export class KanbanComponent {
     { id: 1, name: 'WIP' },
     { id: 2, name: 'Done' },
   ];
+  show_dialog = false; 
   createTask(statuses: Array<Status>): void {
+    this.show_dialog =true;
     let tasks = this.getTasks('tasks');
     tasks.push({
       id: 0,
