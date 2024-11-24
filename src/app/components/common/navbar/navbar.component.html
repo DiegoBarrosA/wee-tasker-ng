@@ -25,8 +25,8 @@
         </div>
       </div>
       <div class="hidden sm:ml-6 sm:flex sm:items-center">
-
-        <button class="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600">
+        <button *ngIf="this.utils.getActiveUser() == null"
+          class="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600">
           Sign Up
         </button>
       </div>

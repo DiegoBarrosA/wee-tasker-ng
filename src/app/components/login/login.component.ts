@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
-
 import { NavbarComponent } from '../common/navbar/navbar.component';
+
+import { UtilsService } from '../../services/utils.service';
+import { NavigationExtras, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -9,11 +11,9 @@ import {
   Validators,
 } from '@angular/forms';
 /**
-* @description
-* Componente principal del login
-*/
-
-
+ * @description
+ * Componente principal del login
+ */
 @Component({
   selector: 'app-login',
   imports: [ReactiveFormsModule, CommonModule, NavbarComponent],
@@ -22,14 +22,18 @@ import {
 })
 export class LoginComponent {
   loginForm!: FormGroup;
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private utils: UtilsService,
+  ) {}
   ngOnInit(): void {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
+    this.goToKanban();
   }
-
   getErrorMessage(controlName: string): string {
     const control = this.loginForm.get(controlName);
     if (control && control.errors) {
@@ -46,10 +50,18 @@ export class LoginComponent {
   }
   submitForm() {
     if (this.loginForm.valid) {
-      console.log('Look! ' + this.loginForm.get('email')!.value);
+      let email = this.loginForm.get('email')!.value;
+      localStorage.setItem('active_user', JSON.stringify({ email: email }));
     } else {
       console.log('Nope');
     }
     return null;
   }
+  goToKanban() {
+    if (this.utils.getActiveUser() != null) {
+      this.router.navigate(['kanban']);
+    }
+    console.log('Go to kanban!');
+  }
+ 
 }

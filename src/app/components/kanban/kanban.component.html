@@ -13,7 +13,7 @@
         </div>
         <div class="flex items-center text-gray-300">
           <p class="mr-2 text-2xl">---</p>
-          <button class="text-2xl create-task-btn" type="button">
+          <button (click)="createTask(this.statuses)" class="text-2xl create-task-btn" type="button">
             +
           </button>
         </div>
@@ -88,6 +88,9 @@
     </div>
   </div>
 </div>
+
+
+
 <div class="relative z-10 hidden" aria-labelledby="modal-title" id="new-task-modal" role="dialog" aria-modal="true">
   <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
   <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
