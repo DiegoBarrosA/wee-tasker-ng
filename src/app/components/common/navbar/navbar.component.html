@@ -1,4 +1,4 @@
-<nav class="bg-white ">
+<nav class="bg-white">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between h-16">
       <div class="flex">
@@ -6,22 +6,54 @@
           <a href="#" class="text-xl font-semibold text-gray-800">Wee Tasker</a>
         </div>
         <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-          <a href="kanban"
-            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+          <a
+            href="kanban"
+            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+          >
             Kanban
           </a>
         </div>
       </div>
+
       <div class="hidden sm:ml-6 sm:flex sm:items-center">
-        <button *ngIf="this.utils.getActiveUser() == null" href="register"
-          class="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600">
+        <button
+          *ngIf="this.utils.getActiveUser() == null"
+          [routerLink]="['/register']"
+          class="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600"
+        >
           Sign Up
         </button>
         <div class="px-1"></div>
-        <button href="login" *ngIf="this.utils.getActiveUser() == null"
-          class="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600">
+        <button
+          [routerLink]="['/login']"
+          *ngIf="this.utils.getActiveUser() == null"
+          class="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600"
+        >
           Login
         </button>
+
+        <!-- User dropdown when logged in -->
+        <div class="ml-3 relative" *ngIf="this.utils.getActiveUser()">
+          <div>
+            <p class="text-black font-bold text-xl">
+              {{ this.utils.getActiveUser()?.username }}
+            </p>
+          </div>
+          <div>
+            <button
+              type="button"
+              class="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              id="user-menu-button"
+            >
+              <span class="sr-only">Open user menu</span>
+              <img
+                class="h-8 w-8 rounded-full"
+                src="https://via.placeholder.com/32"
+                alt="User avatar"
+              />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
