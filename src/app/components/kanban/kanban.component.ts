@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { NavbarComponent } from '../common/navbar/navbar.component';
 
+import { UtilsService } from '../../services/utils.service';
+import { Router } from '@angular/router';
 import {
   FormBuilder,
   FormGroup,
@@ -29,8 +31,13 @@ interface Task {
 })
 export class KanbanComponent {
   taskCreationForm!: FormGroup;
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private utils: UtilsService,
+  ) {}
   ngOnInit(): void {
+    this.goToLogin();
     this.taskCreationForm = this.fb.group({
       summary: ['', [Validators.required, Validators.maxLength(250)]],
       description: ['', [Validators.required]],
@@ -120,5 +127,12 @@ export class KanbanComponent {
 
   getTaskCountByStatus(status: Status): number {
     return this.tasks.filter((task) => task.status.id === status.id).length;
+  }
+
+  goToLogin() {
+    if (this.utils.getActiveUser() == null) {
+      this.router.navigate(['login']);
+    }
+    console.log('Please login');
   }
 }

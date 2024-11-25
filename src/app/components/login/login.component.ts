@@ -14,6 +14,15 @@ import {
  * @description
  * Componente principal del login
  */
+
+interface User {
+  id: number;
+  email: string;
+  password: string;
+  username: string;
+  birthdate: Date;
+}
+
 @Component({
   selector: 'app-login',
   imports: [ReactiveFormsModule, CommonModule, NavbarComponent],
@@ -51,7 +60,15 @@ export class LoginComponent {
   submitForm() {
     if (this.loginForm.valid) {
       let email = this.loginForm.get('email')!.value;
-      localStorage.setItem('active_user', JSON.stringify({ email: email }));
+      let password = this.loginForm.get('password')!.value;
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
+      const user = users.find(
+        (current_user: User) =>
+          current_user.email === email && current_user.password === password,
+      );
+      if (user) {
+        localStorage.setItem('active_user', JSON.stringify(user));
+      }
     } else {
       console.log('Nope');
     }
@@ -63,6 +80,4 @@ export class LoginComponent {
     }
     console.log('Go to kanban!');
   }
- 
-
 }
