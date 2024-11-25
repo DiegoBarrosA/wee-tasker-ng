@@ -10,7 +10,8 @@
         (system: f nixpkgs.legacyPackages.${system});
     in {
       devShells = eachSystem (pkgs: {
-        default = pkgs.mkShell { buildInputs = [ pkgs.nodejs_20 ]; };
+        default =
+          pkgs.mkShell { buildInputs = [ pkgs.nodejs_20 pkgs.google-chrome ]; };
       });
     };
 }
