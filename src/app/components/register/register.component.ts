@@ -45,7 +45,7 @@ export class RegisterComponent {
   passwordMatchValidator(formGroup: FormGroup) {
     return formGroup.get('password')?.value ===
       formGroup.get('repeat_password')?.value
-      ? null
+      ? {mismatch: false }
       : { mismatch: true };
   }
 

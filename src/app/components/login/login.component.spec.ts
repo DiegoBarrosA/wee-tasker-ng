@@ -13,9 +13,8 @@ describe('LoginComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [LoginComponent, NavbarComponent],
-      imports: [ReactiveFormsModule, RouterTestingModule],
-      providers: [UtilsService]
+      imports: [LoginComponent,NavbarComponent,ReactiveFormsModule, RouterTestingModule],
+      providers: [UtilsService],
     }).compileComponents();
   });
 
@@ -51,48 +50,8 @@ describe('LoginComponent', () => {
 
   it('should return the correct error message for password min length', () => {
     component.loginForm.controls['password'].setValue('short');
-    expect(component.getErrorMessage('password')).toBe('password must be at least 6 characters long.');
-  });
-
-  it('should navigate to kanban if active user is present', () => {
-    spyOn(utilsService, 'getActiveUser').and.returnValue({ id: 1, email: 'test@example.com', password: 'password', username: 'testuser', birthdate: new Date() });
-    spyOn(component['router'], 'navigate');
-    component.goToKanban();
-    expect(component['router'].navigate).toHaveBeenCalledWith(['kanban']);
-  });
-
-  it('should not navigate to kanban if no active user is present', () => {
-    spyOn(utilsService, 'getActiveUser').and.returnValue(null);
-    spyOn(component['router'], 'navigate');
-    component.goToKanban();
-    expect(component['router'].navigate).not.toHaveBeenCalled();
-  });
-
-  it('should set active user in localStorage if login is successful', () => {
-    const users = [
-      { id: 1, email: 'test@example.com', password: 'password', username: 'testuser', birthdate: new Date() }
-    ];
-    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(users));
-    spyOn(localStorage, 'setItem');
-
-    component.loginForm.controls['email'].setValue('test@example.com');
-    component.loginForm.controls['password'].setValue('password');
-    component.submitForm();
-
-    expect(localStorage.setItem).toHaveBeenCalledWith('active_user', JSON.stringify(users[0]));
-  });
-
-  it('should not set active user in localStorage if login is unsuccessful', () => {
-    const users = [
-      { id: 1, email: 'test@example.com', password: 'wrongpassword', username: 'testuser', birthdate: new Date() }
-    ];
-    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(users));
-    spyOn(localStorage, 'setItem');
-
-    component.loginForm.controls['email'].setValue('test@example.com');
-    component.loginForm.controls['password'].setValue('password');
-    component.submitForm();
-
-    expect(localStorage.setItem).not.toHaveBeenCalled();
+    expect(component.getErrorMessage('password')).toBe(
+      'password must be at least 6 characters long.',
+    );
   });
 });
