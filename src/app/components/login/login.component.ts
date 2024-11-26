@@ -77,7 +77,7 @@ export class LoginComponent {
   ngOnInit(): void {
     this.loginForm = this.fb.group({
       email: ["", [Validators.required, Validators.email]],
-      password: ["", [Validators.required, Validators.minLength(6)]],
+      password: ["", [Validators.required]],
     });
     this.goToKanban();
   }
@@ -118,6 +118,8 @@ export class LoginComponent {
       );
       if (user) {
         localStorage.setItem("active_user", JSON.stringify(user));
+
+        this.goToKanban();
       }
     } else {
       console.log("Nope");

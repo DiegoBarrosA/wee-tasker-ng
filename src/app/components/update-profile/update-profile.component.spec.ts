@@ -1,11 +1,11 @@
 import { ActivatedRoute } from "@angular/router";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { NavbarComponent } from "./navbar.component";
+import { UpdateProfileComponent } from "./update-profile.component";
 
-describe("NavbarComponent", () => {
-  let component: NavbarComponent;
-  let fixture: ComponentFixture<NavbarComponent>;
+describe("UpdateProfileComponent", () => {
+  let component: UpdateProfileComponent;
+  let fixture: ComponentFixture<UpdateProfileComponent>;
 
   beforeEach(async () => {
     const mockActivatedRoute = {
@@ -16,10 +16,10 @@ describe("NavbarComponent", () => {
       providers: [{ provide: ActivatedRoute, useValue: mockActivatedRoute }],
     });
     await TestBed.configureTestingModule({
-      imports: [NavbarComponent],
+      imports: [UpdateProfileComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(NavbarComponent);
+    fixture = TestBed.createComponent(UpdateProfileComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

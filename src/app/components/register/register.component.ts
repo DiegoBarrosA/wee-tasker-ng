@@ -10,6 +10,8 @@ import {
   FormGroup,
   Validators,
   ReactiveFormsModule,
+  AbstractControl,
+  ValidationErrors,
 } from "@angular/forms";
 
 /**
@@ -45,17 +47,48 @@ export class RegisterComponent {
     private utils: UtilsService,
     private router: Router,
   ) {}
+
+  passwordValidator(control: AbstractControl): ValidationErrors | null {
+    const value = control.value;
+
+    const hasUpperCase = /[A-Z]/.test(value);
+    const hasNumber = /[0-9]/.test(value);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+
+    const valid = hasUpperCase && hasNumber && hasSpecialChar;
+
+    if (!valid) {
+      return {
+        passwordComplexity: true,
+        requirements: {
+          upperCase: !hasUpperCase,
+          number: !hasNumber,
+          specialChar: !hasSpecialChar,
+        },
+      };
+    }
+
+    return null;
+  }
+
   ngOnInit() {
     this.goToKanban();
     this.registerForm = this.fb.group(
       {
         email: ["", [Validators.required, Validators.email]],
-        password: ["", [Validators.required, Validators.minLength(6)]],
+        password: [
+          "",
+          [
+            Validators.required,
+            Validators.minLength(6),
+            this.passwordValidator,
+          ],
+        ],
         repeat_password: ["", [Validators.required]],
         username: ["", [Validators.required, Validators.minLength(3)]],
         birthdate: ["", [Validators.required]],
       },
-      { validator: this.passwordMatchValidator },
+      { validators: this.passwordMatchValidator },
     );
   }
 
@@ -63,11 +96,17 @@ export class RegisterComponent {
     { id: 0, name: "administrator" },
     { id: 1, name: "enduser" },
   ];
-  passwordMatchValidator(formGroup: FormGroup) {
-    return formGroup.get("password")?.value ===
-      formGroup.get("repeat_password")?.value
-      ? null
-      : { mismatch: true };
+
+  passwordMatchValidator(formGroup: FormGroup): ValidationErrors | null {
+    const password = formGroup.get("password");
+    const repeatPassword = formGroup.get("repeat_password");
+
+    if (password && repeatPassword && password.value !== repeatPassword.value) {
+      repeatPassword.setErrors({ mismatch: true });
+      return { mismatch: true };
+    }
+
+    return null;
   }
 
   onSubmit() {
@@ -83,6 +122,8 @@ export class RegisterComponent {
       };
       this.saveUserToLocalStorage(user);
       localStorage.setItem("active_user", JSON.stringify(user));
+
+      window.location.reload();
     }
 
     console.log(this.registerForm.value);
@@ -98,6 +139,13 @@ export class RegisterComponent {
       return `${field} must be at least ${control.errors?.["minlength"].requiredLength} characters`;
     } else if (control?.hasError("mismatch")) {
       return "Passwords do not match";
+    } else if (control?.hasError("passwordComplexity")) {
+      const reqs = control.errors?.["requirements"];
+      let message = "Password must contain ";
+      if (reqs.upperCase) message += "an uppercase letter, ";
+      if (reqs.number) message += "a number, ";
+      if (reqs.specialChar) message += "a special character, ";
+      return message.slice(0, -2);
     }
     return "";
   }

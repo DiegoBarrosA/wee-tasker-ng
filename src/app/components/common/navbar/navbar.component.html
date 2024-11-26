@@ -1,4 +1,4 @@
-<nav class="bg-white">
+<nav class="bg-zinc-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between h-16">
       <div class="flex">
@@ -33,25 +33,56 @@
         </button>
 
         <!-- User dropdown when logged in -->
-        <div class="ml-3 relative" *ngIf="this.utils.getActiveUser()">
-          <div>
-            <p class="text-black font-bold text-xl">
+        <div
+          class="ml-3 relative grid grid-cols-2"
+          *ngIf="this.utils.getActiveUser()"
+        >
+          <div class="">
+            <p class="text-black font-bold text-xl px-3">
               {{ this.utils.getActiveUser()?.username }}
             </p>
           </div>
-          <div>
+          <div class="px-2 relative">
             <button
               type="button"
               class="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               id="user-menu-button"
+              (click)="isDropdownOpen = !isDropdownOpen"
             >
               <span class="sr-only">Open user menu</span>
               <img
-                class="h-8 w-8 rounded-full"
-                src="https://via.placeholder.com/32"
+                class="h-9 w-9 rounded-full"
+                src="https://i.pravatar.cc/300"
                 alt="User avatar"
               />
             </button>
+            <div
+              *ngIf="isDropdownOpen"
+              class="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+            >
+              <div class="py-1">
+                <a
+                  *ngIf="this.utils.getActiveUser()?.type?.id == 0"
+                  href="/admin/manage-users"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  Manage users
+                </a>
+                <a
+                  [routerLink]="['/profile']"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  Update my profile
+                </a>
+                <a
+                  href="#"
+                  (click)="logout()"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  Logout
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>

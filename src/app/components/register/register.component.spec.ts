@@ -1,17 +1,40 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
-import { RegisterComponent } from './register.component';
-import { NavbarComponent } from '../common/navbar/navbar.component';
-import { By } from '@angular/platform-browser';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { RegisterComponent } from "./register.component";
+import { FormBuilder, ReactiveFormsModule } from "@angular/forms";
+import { Router, ActivatedRoute } from "@angular/router";
+import { UtilsService } from "../../services/utils.service";
+import { CommonModule } from "@angular/common";
 
-describe('RegisterComponent', () => {
+describe("RegisterComponent", () => {
   let component: RegisterComponent;
   let fixture: ComponentFixture<RegisterComponent>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let utilsServiceSpy: jasmine.SpyObj<UtilsService>;
 
   beforeEach(async () => {
+    const routerSpyObj = jasmine.createSpyObj("Router", ["navigate"]);
+    const utilsSpyObj = jasmine.createSpyObj("UtilsService", [
+      "getActiveUser",
+      "setActiveUser",
+    ]);
+    const activatedRouteSpy = jasmine.createSpyObj("ActivatedRoute", [], {
+      snapshot: {},
+    });
+
     await TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, RegisterComponent, NavbarComponent]
+      imports: [ReactiveFormsModule, CommonModule, RegisterComponent],
+      providers: [
+        FormBuilder,
+        { provide: Router, useValue: routerSpyObj },
+        { provide: UtilsService, useValue: utilsSpyObj },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+      ],
     }).compileComponents();
+
+    routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    utilsServiceSpy = TestBed.inject(
+      UtilsService,
+    ) as jasmine.SpyObj<UtilsService>;
   });
 
   beforeEach(() => {
@@ -20,61 +43,71 @@ describe('RegisterComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize the form with the correct controls', () => {
-    component.ngOnInit();
-    expect(component.registerForm.contains('email')).toBeTruthy();
-    expect(component.registerForm.contains('password')).toBeTruthy();
-    expect(component.registerForm.contains('repeat_password')).toBeTruthy();
-    expect(component.registerForm.contains('username')).toBeTruthy();
-    expect(component.registerForm.contains('birthdate')).toBeTruthy();
+  it("should initialize the form with empty fields", () => {
+    expect(component.registerForm.get("email")?.value).toBe("");
+    expect(component.registerForm.get("password")?.value).toBe("");
+    expect(component.registerForm.get("repeat_password")?.value).toBe("");
+    expect(component.registerForm.get("username")?.value).toBe("");
+    expect(component.registerForm.get("birthdate")?.value).toBe("");
   });
 
-  it('should return the correct error message for required fields', () => {
-    component.registerForm.controls['email'].setValue('');
-    expect(component.getErrorMessage('email')).toBe('email is required');
+  it("should validate required fields", () => {
+    const form = component.registerForm;
+    expect(form.valid).toBeFalsy();
 
-    component.registerForm.controls['password'].setValue('');
-    expect(component.getErrorMessage('password')).toBe('password is required');
+    form.controls["email"].setValue("test@test.com");
+    form.controls["password"].setValue("Test123!");
+    form.controls["repeat_password"].setValue("Test123!");
+    form.controls["username"].setValue("testuser");
+    form.controls["birthdate"].setValue("2000-01-01");
 
-    component.registerForm.controls['repeat_password'].setValue('');
-    expect(component.getErrorMessage('repeat_password')).toBe('repeat_password is required');
-
-    component.registerForm.controls['username'].setValue('');
-    expect(component.getErrorMessage('username')).toBe('username is required');
-
-    component.registerForm.controls['birthdate'].setValue('');
-    expect(component.getErrorMessage('birthdate')).toBe('birthdate is required');
+    expect(form.valid).toBeTruthy();
   });
 
-  it('should return the correct error message for invalid email format', () => {
-    component.registerForm.controls['email'].setValue('invalid-email');
-    expect(component.getErrorMessage('email')).toBe('Invalid email format');
+  it("should validate password complexity", () => {
+    const passwordControl = component.registerForm.controls["password"];
+
+    passwordControl.setValue("weakpass");
+    expect(passwordControl.errors?.["passwordComplexity"]).toBeTruthy();
+
+    passwordControl.setValue("Test123!");
+    expect(passwordControl.errors).toBeNull();
   });
 
-  it('should return the correct error message for password min length', () => {
-    component.registerForm.controls['password'].setValue('short');
-    expect(component.getErrorMessage('password')).toBe('password must be at least 6 characters');
+  it("should validate password match", () => {
+    const form = component.registerForm;
+
+    form.controls["password"].setValue("Test123!");
+    form.controls["repeat_password"].setValue("Test123");
+    expect(form.errors?.["mismatch"]).toBeTruthy();
+
+    form.controls["repeat_password"].setValue("Test123!");
+    expect(form.errors).toBeNull();
   });
 
-  it('should return the correct error message for username min length', () => {
-    component.registerForm.controls['username'].setValue('ab');
-    expect(component.getErrorMessage('username')).toBe('username must be at least 3 characters');
+  it("should not navigate to kanban when no active user", () => {
+    utilsServiceSpy.getActiveUser.and.returnValue(null);
+    component.goToKanban();
+    expect(routerSpy.navigate).not.toHaveBeenCalled();
   });
-  it('should not save user to localStorage if form is invalid', () => {
-    spyOn(localStorage, 'setItem');
 
-    component.registerForm.controls['email'].setValue('');
-    component.registerForm.controls['password'].setValue('');
-    component.registerForm.controls['repeat_password'].setValue('');
-    component.registerForm.controls['username'].setValue('');
-    component.registerForm.controls['birthdate'].setValue('');
+  it("should return correct error messages", () => {
+    const emailControl = component.registerForm.controls["email"];
+    emailControl.setErrors({ required: true });
+    expect(component.getErrorMessage("email")).toBe("email is required");
 
-    component.onSubmit();
+    emailControl.setErrors({ email: true });
+    expect(component.getErrorMessage("email")).toBe("Invalid email format");
 
-    expect(localStorage.setItem).not.toHaveBeenCalled();
+    const passwordControl = component.registerForm.controls["password"];
+    passwordControl.setErrors({
+      passwordComplexity: true,
+      requirements: { upperCase: true, number: true, specialChar: false },
+    });
+    expect(component.getErrorMessage("password")).toContain("must contain");
   });
 });

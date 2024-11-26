@@ -11,4 +11,11 @@ import { RouterModule } from "@angular/router";
 export class NavbarComponent {
   constructor(public utils: UtilsService) {}
   ngOnInit() {}
+
+  isDropdownOpen: boolean = false;
+
+  logout() {
+    localStorage.removeItem("active_user");
+    window.location.href = "/login";
+  }
 }
