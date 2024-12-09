@@ -1,0 +1,6 @@
+{
+  "user_types": [
+    { "id": 0, "name": "administrator" },
+    { "id": 1, "name": "enduser" }
+  ]
+}

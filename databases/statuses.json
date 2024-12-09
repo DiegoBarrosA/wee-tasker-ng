@@ -1,0 +1,19 @@
+{
+  "statuses": [
+    {
+      "id": 0,
+      "name": "To Do",
+      "tailwind_class": "bg-red-100 text-xs w-max p-1 rounded mr-2 text-gray-700"
+    },
+    {
+      "id": 1,
+      "name": "WIP",
+      "tailwind_class": "bg-yellow-100 text-xs w-max p-1 rounded mr-2 text-gray-700"
+    },
+    {
+      "id": 2,
+      "name": "Done",
+      "tailwind_class": "bg-green-100 text-xs w-max p-1 rounded mr-2 text-gray-700"
+    }
+  ]
+}
