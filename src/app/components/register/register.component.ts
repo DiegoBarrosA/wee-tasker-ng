@@ -1,5 +1,6 @@
 import { Component } from "@angular/core";
-
+import { HttpClientModule } from "@angular/common/http";
+import { JsonService } from "../../services/json.service";
 import { Router } from "@angular/router";
 import { NavbarComponent } from "../common/navbar/navbar.component";
 import { UtilsService } from "../../services/utils.service";
@@ -35,14 +36,23 @@ interface User {
 
 @Component({
   selector: "app-register",
-  imports: [NavbarComponent, CommonModule, ReactiveFormsModule],
+  imports: [
+    NavbarComponent,
+    CommonModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+  ],
   templateUrl: "./register.component.html",
   styleUrl: "./register.component.css",
+
+  providers: [JsonService],
 })
 export class RegisterComponent {
   registerForm!: FormGroup;
-
+  users: any[] = [];
+  userTypes: any[] = [];
   constructor(
+    private jsonService: JsonService,
     private fb: FormBuilder,
     private utils: UtilsService,
     private router: Router,
@@ -71,8 +81,31 @@ export class RegisterComponent {
     return null;
   }
 
+  birthdateValidator(control: AbstractControl): ValidationErrors | null {
+    const birthdate = new Date(control.value);
+    const today = new Date();
+    const hundredYearsAgo = new Date();
+    hundredYearsAgo.setFullYear(today.getFullYear() - 100);
+
+    if (birthdate > today) {
+      return { futureDate: true };
+    }
+    if (birthdate < hundredYearsAgo) {
+      return { tooOld: true };
+    }
+
+    return null;
+  }
+
   ngOnInit() {
     this.goToKanban();
+    this.jsonService.getJsonData("user_types").subscribe((data) => {
+      this.userTypes = data["user_types"];
+    });
+    this.jsonService.getJsonData("users").subscribe((data) => {
+      this.users = data["users"];
+      console.log(this.users);
+    });
     this.registerForm = this.fb.group(
       {
         email: ["", [Validators.required, Validators.email]],
@@ -86,16 +119,11 @@ export class RegisterComponent {
         ],
         repeat_password: ["", [Validators.required]],
         username: ["", [Validators.required, Validators.minLength(3)]],
-        birthdate: ["", [Validators.required]],
+        birthdate: ["", [Validators.required, this.birthdateValidator]],
       },
       { validators: this.passwordMatchValidator },
     );
   }
-
-  userTypes: UserType[] = [
-    { id: 0, name: "administrator" },
-    { id: 1, name: "enduser" },
-  ];
 
   passwordMatchValidator(formGroup: FormGroup): ValidationErrors | null {
     const password = formGroup.get("password");
@@ -111,7 +139,7 @@ export class RegisterComponent {
 
   onSubmit() {
     if (this.registerForm.valid) {
-      const users = JSON.parse(localStorage.getItem("users") || "[]");
+      const users = this.users;
       let user: User = {
         id: users.length + 1,
         email: this.registerForm.value.email,
@@ -120,10 +148,13 @@ export class RegisterComponent {
         birthdate: this.registerForm.value.birthdate,
         type: this.userTypes[1],
       };
-      this.saveUserToLocalStorage(user);
+      users.push(user);
+      console.log("-----------------------------------------------------");
+      console.log(users);
+      this.jsonService.updateObject("users", users);
       localStorage.setItem("active_user", JSON.stringify(user));
 
-      window.location.reload();
+      // window.location.reload();
     }
 
     console.log(this.registerForm.value);
@@ -146,6 +177,10 @@ export class RegisterComponent {
       if (reqs.number) message += "a number, ";
       if (reqs.specialChar) message += "a special character, ";
       return message.slice(0, -2);
+    } else if (control?.hasError("futureDate")) {
+      return "Birthdate cannot be in the future";
+    } else if (control?.hasError("tooOld")) {
+      return "Birthdate cannot be more than 100 years ago";
     }
     return "";
   }

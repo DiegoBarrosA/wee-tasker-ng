@@ -1,8 +1,11 @@
 import { Component } from "@angular/core";
 import { NavbarComponent } from "../common/navbar/navbar.component";
+
+import { HttpClientModule } from "@angular/common/http";
 import { UtilsService } from "../../services/utils.service";
 import { Router } from "@angular/router";
 import { CommonModule } from "@angular/common";
+import { JsonService } from "../../services/json.service";
 import {
   FormBuilder,
   FormGroup,
@@ -39,21 +42,28 @@ interface User {
   /** User's type*/
   type: UserType;
 }
-
 /**
  * Component that handles user login functionality
  * @description Manages the login form and authentication process
  */
 @Component({
   selector: "app-login",
-  imports: [ReactiveFormsModule, CommonModule, NavbarComponent],
+  imports: [
+    ReactiveFormsModule,
+    CommonModule,
+    NavbarComponent,
+    HttpClientModule,
+  ],
   templateUrl: "./login.component.html",
   styleUrl: "./login.component.css",
+
+  providers: [JsonService],
 })
 export class LoginComponent {
   /** Form group for the login form */
   loginForm!: FormGroup;
-
+  userTypes: any[] = [];
+  users: any[] = [];
   /**
    * Creates an instance of LoginComponent
    * @param fb - FormBuilder service for creating reactive forms
@@ -61,15 +71,12 @@ export class LoginComponent {
    * @param utils - Utility service for common functionality
    */
   constructor(
+    private jsonService: JsonService,
     private fb: FormBuilder,
     private router: Router,
     private utils: UtilsService,
   ) {}
 
-  userTypes: UserType[] = [
-    { id: 0, name: "administrator" },
-    { id: 1, name: "enduser" },
-  ];
   /**
    * Lifecycle hook that is called after component initialization
    * Initializes the login form and checks if user should be redirected to kanban only if they user is already authenticated.
@@ -80,6 +87,13 @@ export class LoginComponent {
       password: ["", [Validators.required]],
     });
     this.goToKanban();
+    this.jsonService.getJsonData("user_types").subscribe((data) => {
+      this.userTypes = data["user_types"];
+    });
+    this.jsonService.getJsonData("users").subscribe((data) => {
+      this.users = data["users"];
+      console.log(this.users);
+    });
   }
 
   /**
@@ -108,10 +122,11 @@ export class LoginComponent {
    * @returns null
    */
   submitForm() {
+    console.log(this.userTypes);
     if (this.loginForm.valid) {
       let email = this.loginForm.get("email")!.value;
       let password = this.loginForm.get("password")!.value;
-      let users = JSON.parse(localStorage.getItem("users") || "[]");
+      let users = this.users;
       const user = users.find(
         (current_user: User) =>
           current_user.email === email && current_user.password === password,
@@ -120,9 +135,10 @@ export class LoginComponent {
         localStorage.setItem("active_user", JSON.stringify(user));
 
         this.goToKanban();
+      } else {
+        alert("Email or password is invalid");
       }
     } else {
-      console.log("Nope");
     }
     return null;
   }
