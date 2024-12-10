@@ -2,6 +2,9 @@ import { Component } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { CommonModule } from "@angular/common";
 
+import { HttpClientModule } from "@angular/common/http";
+
+import { JsonService } from "../../../services/json.service";
 interface UserType {
   /** Unique identifier for the type of user */
   id: number;
@@ -21,12 +24,19 @@ interface User {
 @Component({
   selector: "app-manage-users",
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, HttpClientModule],
   templateUrl: "./manage-users.component.html",
   styleUrl: "./manage-users.component.css",
+
+  providers: [JsonService],
 })
 export class ManageUsersComponent {
-  users: User[] = JSON.parse(localStorage.getItem("users") || "[]");
+  constructor(private jsonService: JsonService) {
+    this.jsonService.getJsonData("users").subscribe((data: any) => {
+      this.users = data["users"] || [];
+    });
+  }
+  users: User[] = [];
   userTypes: UserType[] = [
     { id: 0, name: "administrator" },
     { id: 1, name: "enduser" },
@@ -70,7 +80,7 @@ export class ManageUsersComponent {
 
   deleteUser(user: User) {
     this.users = this.users.filter((u) => u.id !== user.id);
-    localStorage.setItem("users", JSON.stringify(this.users));
+    this.jsonService.updateObject("users", this.users);
   }
 
   saveUser() {
@@ -86,7 +96,7 @@ export class ManageUsersComponent {
       };
       this.users.push(newUser);
     }
-    localStorage.setItem("users", JSON.stringify(this.users));
+    this.jsonService.updateObject("users", this.users);
     this.closeModal();
   }
 
