@@ -1,15 +1,16 @@
-import { Component } from '@angular/core';
-import { NavbarComponent } from '../common/navbar/navbar.component';
-
-import { UtilsService } from '../../services/utils.service';
-import { Router } from '@angular/router';
+import { Component } from "@angular/core";
+import { NavbarComponent } from "../common/navbar/navbar.component";
+import { HttpClientModule } from "@angular/common/http";
+import { JsonService } from "../../services/json.service";
+import { UtilsService } from "../../services/utils.service";
+import { Router } from "@angular/router";
 import {
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
   Validators,
-} from '@angular/forms';
-import { CommonModule } from '@angular/common';
+} from "@angular/forms";
+import { CommonModule } from "@angular/common";
 interface Status {
   id: number;
   name: string;
@@ -24,93 +25,92 @@ interface Task {
 }
 
 @Component({
-  selector: 'app-kanban',
-  imports: [NavbarComponent, CommonModule, ReactiveFormsModule],
-  templateUrl: './kanban.component.html',
-  styleUrl: './kanban.component.css',
+  selector: "app-kanban",
+  imports: [
+    NavbarComponent,
+    CommonModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+  ],
+  templateUrl: "./kanban.component.html",
+  styleUrl: "./kanban.component.css",
+  providers: [JsonService],
 })
 export class KanbanComponent {
+  tasks: any[] = [];
+  statuses: any[] = [];
   taskCreationForm!: FormGroup;
   constructor(
     private fb: FormBuilder,
+
+    private jsonService: JsonService,
     private router: Router,
     private utils: UtilsService,
   ) {}
   ngOnInit(): void {
     this.goToLogin();
     this.taskCreationForm = this.fb.group({
-      summary: ['', [Validators.required, Validators.maxLength(250)]],
-      description: ['', [Validators.required]],
+      summary: ["", [Validators.required, Validators.maxLength(250)]],
+      description: ["", [Validators.required]],
+    });
+    this.jsonService.getJsonData("tasks").subscribe((data) => {
+      this.tasks = data["tasks"];
+      console.log(this.tasks);
+    });
+    this.jsonService.getJsonData("statuses").subscribe((data) => {
+      this.statuses = data["statuses"];
+      console.log(this.statuses);
     });
   }
   getErrorMessage(controlName: string): string {
     const control = this.taskCreationForm.get(controlName);
     if (control && control.errors) {
-      if (control.errors['required']) {
+      if (control.errors["required"]) {
         return `${controlName} is required.`;
-      } else if (control.errors['minlength']) {
-        const requiredLength = control.errors['minlength'].requiredLength;
+      } else if (control.errors["minlength"]) {
+        const requiredLength = control.errors["minlength"].requiredLength;
         return `${controlName} must be at least ${requiredLength} characters long.`;
-      } else if (control.errors['email']) {
-        return 'Invalid email format.';
-      } else if (control.errors['maxlength']) {
-        const requiredLength = control.errors['maxlength'].requiredLength;
+      } else if (control.errors["email"]) {
+        return "Invalid email format.";
+      } else if (control.errors["maxlength"]) {
+        const requiredLength = control.errors["maxlength"].requiredLength;
         return `${controlName} can't be more thant ${requiredLength} characters long.`;
       }
     }
-    return '';
+    return "";
   }
-  statuses: Status[] = [
-    {
-      id: 0,
-      name: 'To Do',
-      tailwind_class: 'bg-red-100 text-xs w-max p-1 rounded mr-2 text-gray-700',
-    },
-    {
-      id: 1,
-      name: 'WIP',
-      tailwind_class:
-        'bg-yellow-100 text-xs w-max p-1 rounded mr-2 text-gray-700',
-    },
-    {
-      id: 2,
-      name: 'Done',
-      tailwind_class:
-        'bg-green-100 text-xs w-max p-1 rounded mr-2 text-gray-700',
-    },
-  ];
-
-  tasks = this.getTasks('tasks');
 
   show_dialog = false;
-  submitTask(statuses: Array<Status>) {
+  submitTask(statuses: Status[]) {
     if (this.taskCreationForm.valid) {
-      let summary = this.taskCreationForm.get('summary')?.value;
-      let description = this.taskCreationForm.get('description')?.value;
+      console.log("Valis!!");
+      let summary = this.taskCreationForm.get("summary")?.value;
+      let description = this.taskCreationForm.get("description")?.value;
 
-      let tasks = this.getTasks('tasks');
+      let tasks = this.tasks;
       tasks.push({
-        id: 0,
+        id: tasks.length + 1,
         summary: summary,
         description: description,
-        status: statuses[0],
+        status: this.statuses[0],
       });
-      localStorage.setItem('tasks', JSON.stringify(tasks));
+      console.log("Look ", tasks);
+      this.jsonService.updateObject("tasks", tasks);
       this.show_dialog = false;
-
-      window.location.reload();
+      // window.location.reload();
     }
   }
 
-  getTasks(storageKey: string): Array<Task> {
-    const storedArray = localStorage.getItem(storageKey);
-    let myArray: Task[] = [];
-    if (storedArray) {
-      myArray = JSON.parse(storedArray);
-    }
-    return myArray;
-  }
+  // getTasks(storageKey: string): Array<Task> {
+  //   // const storedArray = localStorage.getItem(storageKey);
 
+  //   const storedArray = this.jsonService.getJsonData("tasks")["tasks"];
+  //   let myArray: Task[] = [];
+  //   if (storedArray) {
+  //     myArray = JSON.parse(storedArray);
+  //   }
+  //   return myArray;
+  // }
   onStatusChange(task: Task, event: any) {
     const selectedStatusId = parseInt(event.target.value, 10);
     const selectedStatus = this.statuses.find(
@@ -118,21 +118,26 @@ export class KanbanComponent {
     );
     if (selectedStatus) {
       task.status = selectedStatus;
-      this.saveTasksToLocalStorage();
+      const taskIndex = this.tasks.findIndex((t) => t.id === task.id);
+      if (taskIndex !== -1) {
+        this.tasks[taskIndex] = task;
+        this.jsonService.updateObject("tasks", this.tasks);
+      }
     }
-  }
-  private saveTasksToLocalStorage() {
-    localStorage.setItem('tasks', JSON.stringify(this.tasks));
   }
 
   getTaskCountByStatus(status: Status): number {
-    return this.tasks.filter((task) => task.status.id === status.id).length;
+    if (!this.tasks || this.tasks.length === 0) {
+      return 0;
+    } else {
+      return this.tasks.filter((task) => task.status.id === status.id).length;
+    }
   }
 
   goToLogin() {
     if (this.utils.getActiveUser() == null) {
-      this.router.navigate(['login']);
+      this.router.navigate(["login"]);
     }
-    console.log('Please login');
+    console.log("Please login");
   }
 }

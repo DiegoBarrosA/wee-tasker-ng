@@ -82,6 +82,10 @@ export class LoginComponent {
    * Initializes the login form and checks if user should be redirected to kanban only if they user is already authenticated.
    */
   ngOnInit(): void {
+    this.jsonService.getJsonData("users").subscribe((data) => {
+      this.users = data["users"];
+      console.log(this.users);
+    });
     this.loginForm = this.fb.group({
       email: ["", [Validators.required, Validators.email]],
       password: ["", [Validators.required]],
@@ -89,10 +93,6 @@ export class LoginComponent {
     this.goToKanban();
     this.jsonService.getJsonData("user_types").subscribe((data) => {
       this.userTypes = data["user_types"];
-    });
-    this.jsonService.getJsonData("users").subscribe((data) => {
-      this.users = data["users"];
-      console.log(this.users);
     });
   }
 

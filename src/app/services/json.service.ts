@@ -18,17 +18,18 @@ export class JsonService {
   getJsonData(resource: String): Observable<any> {
     return this.http.get(this.base_url + resource + ".json");
   }
-  updateObject(resource: String, object: any) {
+  updateObject(resource: string, object: any) {
     console.log(object);
+    let newObj = { [resource]: object };
     this.http
-      .put(this.base_url + resource + ".json", object, this.httpOptions)
-      .subscribe(
-        (response) => {
+      .put(this.base_url + resource + ".json", newObj, this.httpOptions)
+      .subscribe({
+        next: (response) => {
           console.log("Archivo JSON sobrescrito con exito", response);
         },
-        (error) => {
+        error: (error) => {
           console.error("Error al sobrescribir el archivo JSON", error);
         },
-      );
+      });
   }
 }
