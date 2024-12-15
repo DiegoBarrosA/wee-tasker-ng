@@ -11,7 +11,7 @@
     in {
       devShells = eachSystem (pkgs: {
         default =
-          pkgs.mkShell { buildInputs = [ pkgs.nodejs_20 pkgs.google-chrome ]; };
+          pkgs.mkShell { buildInputs = [ pkgs.nodejs_20 pkgs.google-chrome]; };
       });
     };
 }

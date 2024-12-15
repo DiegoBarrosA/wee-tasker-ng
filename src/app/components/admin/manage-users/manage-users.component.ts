@@ -27,7 +27,6 @@ interface User {
   imports: [FormsModule, CommonModule, HttpClientModule],
   templateUrl: "./manage-users.component.html",
   styleUrl: "./manage-users.component.css",
-
   providers: [JsonService],
 })
 export class ManageUsersComponent {

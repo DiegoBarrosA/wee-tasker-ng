@@ -1,92 +1,84 @@
 <app-navbar></app-navbar>
-<div
-  class="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12"
->
-  <div class="relative py-3 sm:max-w-xl sm:mx-auto">
-    <div
-      class="relative px-4 py-10 bg-white mx-8 md:mx-0 shadow rounded-3xl sm:p-10"
-    >
-      <div class="max-w-md mx-auto">
-        <div class="divide-y divide-gray-200">
-          <div
-            class="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7"
-          >
-            <form #userForm="ngForm" (ngSubmit)="onSubmit()">
-              <div class="mb-4">
-                <label
-                  class="block text-gray-700 text-sm font-bold mb-2"
-                  for="email"
-                >
-                  Email
-                </label>
-                <input
-                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="email"
-                  type="email"
-                  name="email"
-                  [(ngModel)]="user.email"
-                  [ngModel]="user.email"
-                />
-              </div>
-              <div class="mb-4">
-                <label
-                  class="block text-gray-700 text-sm font-bold mb-2"
-                  for="username"
-                >
-                  Username
-                </label>
-                <input
-                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="username"
-                  type="text"
-                  name="username"
-                  [(ngModel)]="user.username"
-                  [ngModel]="user.username"
-                />
-              </div>
-              <div class="mb-4">
-                <label
-                  class="block text-gray-700 text-sm font-bold mb-2"
-                  for="password"
-                >
-                  Password
-                </label>
-                <input
-                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="password"
-                  type="password"
-                  name="password"
-                  [(ngModel)]="user.password"
-                  [ngModel]="user.password"
-                />
-              </div>
-              <div class="mb-4">
-                <label
-                  class="block text-gray-700 text-sm font-bold mb-2"
-                  for="birthdate"
-                >
-                  Birthdate
-                </label>
-                <input
-                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="birthdate"
-                  type="date"
-                  name="birthdate"
-                  [(ngModel)]="user.birthdate"
-                  [ngModel]="user.birthdate"
-                />
-              </div>
-              <div class="flex items-center justify-between">
-                <button
-                  class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                  type="submit"
-                >
-                  Update Profile
-                </button>
-              </div>
-            </form>
+
+<div class="relative py-3 sm:max-w-xl sm:mx-auto">
+  <div class="max-w-md mx-auto">
+    <div class="divide-y divide-gray-200">
+      <div
+        class="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7"
+      >
+        <form #userForm="ngForm" (ngSubmit)="onSubmit(userForm)">
+          <div class="mb-4">
+            <label
+              class="block text-gray-700 text-sm font-bold mb-2"
+              for="email"
+            >
+              Email
+            </label>
+            <input
+              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="email"
+              type="email"
+              name="email"
+              [(ngModel)]="user.email"
+              [ngModel]="user.email"
+            />
           </div>
-        </div>
+          <div class="mb-4">
+            <label
+              class="block text-gray-700 text-sm font-bold mb-2"
+              for="username"
+            >
+              Username
+            </label>
+            <input
+              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="username"
+              type="text"
+              name="username"
+              [(ngModel)]="user.username"
+              [ngModel]="user.username"
+            />
+          </div>
+          <div class="mb-4">
+            <label
+              class="block text-gray-700 text-sm font-bold mb-2"
+              for="password"
+            >
+              Password
+            </label>
+            <input
+              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="password"
+              type="password"
+              name="password"
+              ngModel
+            />
+          </div>
+          <div class="mb-4">
+            <label
+              class="block text-gray-700 text-sm font-bold mb-2"
+              for="birthdate"
+            >
+              Birthdate
+            </label>
+            <input
+              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="birthdate"
+              type="date"
+              name="birthdate"
+              [(ngModel)]="user.birthdate"
+              [ngModel]="user.birthdate"
+            />
+          </div>
+          <div class="flex items-center justify-between">
+            <button
+              class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              type="submit"
+            >
+              Update Profile
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
