@@ -1,30 +1,40 @@
-import { ActivatedRoute } from "@angular/router";
-import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { UpdateProfileComponent } from './update-profile.component';
+import { JsonService } from '../../services/json.service';
+import { DatePipe } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { NavbarComponent } from '../common/navbar/navbar.component';
+import { of } from 'rxjs';
+import { NgForm } from '@angular/forms';
 
-import { UpdateProfileComponent } from "./update-profile.component";
-
-describe("UpdateProfileComponent", () => {
+describe('UpdateProfileComponent', () => {
   let component: UpdateProfileComponent;
   let fixture: ComponentFixture<UpdateProfileComponent>;
+  let jsonService: jasmine.SpyObj<JsonService>;
+  let datePipe: DatePipe;
 
-  beforeEach(async () => {
-    const mockActivatedRoute = {
-      /* Add mock properties here */
-    };
-
+  beforeEach(() => {
+    // Create spy object for JsonService
+    const jsonServiceSpy = jasmine.createSpyObj('JsonService', ['getJsonData', 'updateObject']);
+    
+    // Set up TestBed
     TestBed.configureTestingModule({
-      providers: [{ provide: ActivatedRoute, useValue: mockActivatedRoute }],
+      imports: [ HttpClientModule, FormsModule,  UpdateProfileComponent, NavbarComponent ],
+      providers: [ 
+        DatePipe, 
+        { provide: JsonService, useValue: jsonServiceSpy }
+      ]
     });
-    await TestBed.configureTestingModule({
-      imports: [UpdateProfileComponent],
-    }).compileComponents();
 
+    // Initialize fixture and component
     fixture = TestBed.createComponent(UpdateProfileComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    jsonService = TestBed.inject(JsonService) as jasmine.SpyObj<JsonService>;
+    datePipe = TestBed.inject(DatePipe);
   });
 
-  it("should create", () => {
+  it('should create the component', () => {
     expect(component).toBeTruthy();
   });
-});
+  });
