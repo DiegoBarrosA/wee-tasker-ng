@@ -25,15 +25,30 @@ interface UserType {
   /** Name for the type of user */
   name: string;
 }
+
+/**
+ * Interface that defines a User object structure
+ * @interface User
+ */
 interface User {
+  /** Unique identifier for the user */
   id: number;
+  /** Email address of the user */
   email: string;
+  /** Password for user authentication */
   password: string;
+  /** Username for display */
   username: string;
+  /** User's date of birth */
   birthdate: Date;
+  /** Type of user account */
   type: UserType;
 }
 
+/**
+ * Component responsible for user registration functionality
+ * @description Handles user registration form, validation, and submission
+ */
 @Component({
   selector: "app-register",
   imports: [
@@ -44,13 +59,23 @@ interface User {
   ],
   templateUrl: "./register.component.html",
   styleUrl: "./register.component.css",
-
   providers: [JsonService],
 })
 export class RegisterComponent {
+  /** Form group for the registration form */
   registerForm!: FormGroup;
+  /** Array to store user data */
   users: any[] = [];
+  /** Array to store user types */
   userTypes: any[] = [];
+
+  /**
+   * Creates an instance of RegisterComponent
+   * @param jsonService Service for handling JSON data operations
+   * @param fb FormBuilder service for creating reactive forms
+   * @param utils Utility service for common functions
+   * @param router Router service for navigation
+   */
   constructor(
     private jsonService: JsonService,
     private fb: FormBuilder,
@@ -58,6 +83,11 @@ export class RegisterComponent {
     private router: Router,
   ) {}
 
+  /**
+   * Custom validator for password complexity
+   * @param control Form control to validate
+   * @returns Validation errors or null if valid
+   */
   passwordValidator(control: AbstractControl): ValidationErrors | null {
     const value = control.value;
 
@@ -81,6 +111,11 @@ export class RegisterComponent {
     return null;
   }
 
+  /**
+   * Custom validator for birthdate
+   * @param control Form control to validate
+   * @returns Validation errors or null if valid
+   */
   birthdateValidator(control: AbstractControl): ValidationErrors | null {
     const birthdate = new Date(control.value);
     const today = new Date();
@@ -97,6 +132,10 @@ export class RegisterComponent {
     return null;
   }
 
+  /**
+   * Lifecycle hook that initializes component
+   * @description Sets up form controls and fetches initial data
+   */
   ngOnInit() {
     this.goToKanban();
     this.jsonService.getJsonData("user_types").subscribe((data) => {
@@ -125,6 +164,11 @@ export class RegisterComponent {
     );
   }
 
+  /**
+   * Validates that password and repeat password match
+   * @param formGroup Form group to validate
+   * @returns Validation errors or null if valid
+   */
   passwordMatchValidator(formGroup: FormGroup): ValidationErrors | null {
     const password = formGroup.get("password");
     const repeatPassword = formGroup.get("repeat_password");
@@ -137,6 +181,10 @@ export class RegisterComponent {
     return null;
   }
 
+  /**
+   * Handles form submission
+   * @description Creates new user if form is valid
+   */
   onSubmit() {
     if (this.registerForm.valid) {
       const users = this.users;
@@ -153,13 +201,16 @@ export class RegisterComponent {
       console.log(users);
       this.jsonService.updateObject("users", users);
       localStorage.setItem("active_user", JSON.stringify(user));
-
-      // window.location.reload();
     }
 
     console.log(this.registerForm.value);
   }
 
+  /**
+   * Gets error message for form field
+   * @param field Name of the form field
+   * @returns Error message string
+   */
   getErrorMessage(field: string): string {
     const control = this.registerForm.get(field);
     if (control?.hasError("required")) {
@@ -185,27 +236,44 @@ export class RegisterComponent {
     return "";
   }
 
+  /**
+   * Saves user data to localStorage
+   * @param user User object to save
+   */
   saveUserToLocalStorage(user: User) {
     const users = JSON.parse(localStorage.getItem("users") || "[]");
     users.push(user);
     localStorage.setItem("users", JSON.stringify(users));
   }
 
+  /** Getter for email form control */
   get email() {
     return this.registerForm.get("email");
   }
+
+  /** Getter for password form control */
   get password() {
     return this.registerForm.get("password");
   }
+
+  /** Getter for repeat password form control */
   get repeat_password() {
     return this.registerForm.get("repeat_password");
   }
+
+  /** Getter for username form control */
   get username() {
     return this.registerForm.get("username");
   }
+
+  /** Getter for birthdate form control */
   get birthdate() {
     return this.registerForm.get("birthdate");
   }
+
+  /**
+   * Navigates to kanban board if user is active
+   */
   goToKanban() {
     if (this.utils.getActiveUser() != null) {
       this.router.navigate(["kanban"]);

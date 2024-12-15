@@ -13,6 +13,7 @@ export class NavbarComponent {
   ngOnInit() {}
 
   isDropdownOpen: boolean = false;
+  isMobileMenuOpen: boolean = false;
 
   logout() {
     localStorage.removeItem("active_user");
